@@ -139,12 +139,22 @@ int main(int argc, char *argv[]) {
         char txt[512];
         sprintf(txt,"%s-%s.txt",geoStem,qryStem);
         
+        char *fullTxtPath = joinPath(config.bsd, txt); 
         char *fullQryOutPath = joinPath(config.bsd, mergedName);
-        FILE *txtFile = fopen(txt,"w");
-        processQry(config.fullQryPath, fullQryOutPath, figures, config.sortType, config.inValue, txtFile);
-        fclose(txtFile);
+        
+        FILE *txtFile = fopen(fullTxtPath, "w"); 
+        
+        if (txtFile) {
+            processQry(config.fullQryPath, fullQryOutPath, figures, config.sortType, config.inValue, txtFile);
+            fclose(txtFile);
+        } else {
+            fprintf(stderr, "ERRO: Não foi possível abrir o arquivo de log TXT em: %s\n", fullTxtPath);
+            processQry(config.fullQryPath, fullQryOutPath, figures, config.sortType, config.inValue, NULL);
+        }
+        
         free(qryStem);
         free(fullQryOutPath);
+        free(fullTxtPath);
     }
 
     free(geoStem);
