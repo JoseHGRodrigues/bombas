@@ -1,83 +1,88 @@
-#ifndef LIST_H
-#define LIST_H
+#ifndef LINKED_LIST_H
+#define LINKED_LIST_H
 
 #include <stdbool.h>
+#include <stdio.h>
 
-/*
- * @brief void pointer para uma lista.
+/**
+ * @brief Um tipo opaco para uma Lista Ligada.
  */
 typedef void *List;
 
-/*
- * @vrief um void pointer para um dado
+/**
+ * @brief Aloca e inicializa uma nova lista ligada vazia.
+ * @return Um ponteiro List para a nova lista, ou NULL se a alocação
+ * falhar.
  */
-typedef void *Data;
-
-/*
-*/
-typedef unsigned int Pos;
-
-/*
- * @brief inicializa uma List.
- * return retorna uma List vazia.
- */ 
 List listInit();
 
-/*
- * @brief libera o espaço de memoria de uma List.
- * @param uma lista.
- * @return true se conseguir liberar o espaço, false caso o contrario.
-*/
-bool listFree(List l);
-
-/*
- * @brief insere no Head da List um novo elemento.
- * @param Uma lista.
- * @param o dado a ser inserido.
- * @return true se conseguir inserir, false caso não.
-*/
-bool listInsertAtHead(List l, Data);
-
-/*
- * @brief insere em uma determinada posição da List.
- * @param a List.
- * @param o dado a ser inserido.
- * @param a posição em que vai ser inserido.
- * @return true se conseguir inserir, false se não.
-*/
-bool listInsertAtPos(List l, Data d, Pos p);
-
-/*
- * @brief insere um novo elemento na ultima posição da List.
- * @param a List.
- * @param o Dado.
- * @return true se conseguir inserir o elemento, false se não.
-*/
-bool listInsertAtLast(List l, Data d);
-
-/*
- * @brief remove e insere o dado de um elemento da lista e insere em Data.
- * @param a lista.
- * @param o Dado em que vai ser inserido.
- * return true se conseguiu inserir, false se não.
+/**
+ * @brief Liberta toda a memória associada à lista.
+ * @param l A lista a ser libertada.
  */
-bool listGetHead(List l, Data d);
+void listFree(List l);
 
-/*
- * @brief remove da List e insere no Data o elemento em P.
- * @param a List.
- * @param o Data para receber o elemento.
- * @param a posição do elemento da List.
- * @return true se conseguiu remover e inserir em Data, false caso contrario.
-*/
-bool listGetPos(List l, Data d, Pos p);
+/**
+ * @brief Adiciona um item ao início da lista.
+ * @param l A lista.
+ * @param data O ponteiro para o dado a ser armazenado.
+ * @return true em caso de sucesso, false se a lista for NULL ou falhar a alocação
+ */
+bool listAddFirst(List l, void *data);
 
-/*
- * @brief remove da List o ultimo elemento e insere no Data.
- * @param a List.
- * @param o Data que vai recebr o elemento.
- * @return true se conseguir inserir e remover o elemento, false caso não.
-*/
-bool listGetLast(List l, Data d);
+/**
+ * @brief Adiciona um item em uma posição da lista.
+ * @param l A lista.
+ * @param data o ponteiro para o dado ser armazenado.
+ * @param pos a posição em que o item esta.
+ * @return true se conseguiur pegar o dado, false se a lista for NULL, se pos for maior que o tamanho da lista e caso falhar
+ */
+bool listAddPos(List l, void *data, int pos);
 
-#endif // !LIST_H
+/**
+ * @brief Adiciona um item na ultima posição da lista.
+ * @param l A lista.
+ * @param data o ponteiro para o dado ser armazenado.
+ * @return true em caso de sucesso, false se a lista for NULL ou falhar.
+ */
+bool listAddLast(List l, void *data);
+
+/**
+ * @brief Retorna o item removido do início da lista.
+ * @param l A lista.
+ * @return O ponteiro (void*) que está no início, ou NULL se a lista
+ * estiver vazia ou for NULL.
+ */
+void *listGetFirst(List l);
+
+/**
+ * @brief Retornao item removido de uma posição da lista.
+ * @param l A list
+ * @param pos A posição a ser removido
+ * @return o ponteiro para o item.
+ */
+void *listGetPos(List l, int pos);
+
+/**
+ * @brief Retorna o ultimo elemento da lista
+ * @param l A lista.
+ * @return o ponteiro do item.
+ */
+void *listGetLast(List l);
+
+/**
+ * @brief Verifica se a lista está vazia.
+ * @param list A lista.
+ * @return true (verdadeiro) se a lista estiver vazia ou for NULL,
+ * false (falso) caso contrário.
+ */
+bool listIsEmpty(List l);
+
+/**
+ * @brief Obtém o número atual de elementos na lista.
+ * @param list A lista.
+ * @return O número de elementos, ou -1 se a lista for NULL.
+ */
+int listGetSize(List l);
+
+#endif // LINKED_LIST_H

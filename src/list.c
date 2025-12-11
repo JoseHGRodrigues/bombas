@@ -1,141 +1,138 @@
 #include "list.h"
-
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
 
-typedef struct node{
-  Data d;
+typedef struct node {
+  void *data;
   struct node *next;
-}*Node;
+} Node;
 
-typedef struct{
-  Node head;
+typedef struct {
+  Node *head;
+  int size;
 } list;
 
-static Node nodeInit(){
-  Node new = (Node)malloc(sizeof(struct node));
-  if(!new)
-    return NULL;
-  new->next = NULL;
-  new->d = NULL;
-  return new;
-}
-
-static Node nodeSearchPos(list *l, Pos p){
-  list *li= (list *)l;
-  if(!li)
-    return NULL;
-  
-  Node pos = li->head;
-
-  for(int i =0; pos != NULL, i < p; i++){
-    pos = pos->next;
-  }
-  
-  return pos;
-}
-
-List listInit(){
+List listInit() {
   list *l = malloc(sizeof(list));
-  if(!l)
+  if (!l)
     return NULL;
   l->head = NULL;
-  return (List) l;
+  l->size = 0;
+  return (List)l;
 }
 
-bool listFree(List l){
-  if(!l)
-    return true;
-  list *li =(list *)l;
-  free(l);
-}
-
-bool listInsertHead(List l, Data d){
-  if(!l)
-    return false;
+void listFree(List l) {
+  if (!l)
+    return;
   list *li = (list *)l;
-  Node new = nodeInit();
-  if(!new)
-    return false;
-  new->d = d;
-  new->next=li->head;
-  li->head=new;
-  if(li->head == new)
-    return true;
-  return false;
-}
-
-bool listInsertAtPos(List l, Data d, Pos p){
-  list *li = (list*)l;
-  if(!li)
-    return false;
-  Node new = nodeInit();
-  if(!new)
-    return false;
-  new->d = d;
-  Node pos = nodeSearchPos(li, p);
-  if(!pos)
-    return false;
-  new->next = pos->next;
-  pos->next = new;
-  return true;
-}
-
-bool listInsertAtLast(List l, Data d){
-  list *li = (list *)l;
-  if(!li)
-    return false;
-  Node new = nodeInit();
-  if(!new)
-    return false;
-  new->d = d;
-  new->next = NULL;
-  Node pos = li->head;
-  while(pos->next !=NULL){
-    pos = pos->next;
+  Node *currentNode = li->head;
+  while (currentNode != NULL) {
+    Node *nodeToFree = currentNode;
+    currentNode = currentNode->next;
+    free(nodeToFree);
   }
-  pos->next = new;
-  return true;
+  free(li);
 }
 
-bool listGetHead(List l, Data d){
+bool listIsEmpty(List l) {
+  if (!l)
+    return true;
   list *li = (list *)l;
-  if(!li)
+  return li->size == 0;
+}
+
+bool listAddFirst(List l, void *data) {
+  if (!l)
     return false;
-  Node temp = li->head;
-  li->head = temp->next;
-  d = temp->d;
-  free(temp);
+  list *li = (list *)l;
+  Node *newNode = malloc(sizeof(Node));
+  if (!newNode)
+    return false;
+  
+  newNode->data = data;
+  newNode->next = li->head;
+  
+  li->head = newNode;
+  li->size++;
   return true;
 }
 
-bool listGetPos(List l, Data d, Pos p){
-  list *li = (list*)l;
-  if(!li)
-    return false;
-  Node pos = nodeSearchPos(li,p);
-  if(!pos)
-    return false;
-  Node temp = pos->next;
-  pos->next = temp->next;
-  d = temp->d;
-  free(temp);
-  return true;
+void *listGetFirst(List l) {
+  if (!l || listIsEmpty(l))
+    return NULL;
+  list *li = (list *)l;
+  return li->head->data;
 }
 
-bool listGetLast(List l, Data d){
-  list *li = (list*)l;
-  if(!li)
-    return false;
-  Node pos = li->head;
-  Node temp = NULL;
-  while(pos->next != NULL){
-    temp = pos;
-    pos = pos->next;
-  }
-  d = pos->d;
-  temp->next =NULL;
-  free(pos);
-  return true;
+// --- FUNÇÕES QUE FALTAVAM ---
+
+bool listAddLast(List l, void *data) {
+    if (!l) return false;
+    list *li = (list *)l;
+    
+    Node *newNode = malloc(sizeof(Node));
+    if (!newNode) return false;
+    newNode->data = data;
+    newNode->next = NULL;
+
+    if (li->head == NULL) {
+        li->head = newNode;
+    } else {
+        Node *aux = li->head;
+        while (aux->next != NULL) {
+            aux = aux->next;
+        }
+        aux->next = newNode;
+    }
+    
+    li->size++;
+    return true;
+}
+
+void *listGetPos(List l, int pos) {
+    if (!l) return NULL;
+    list *li = (list *)l;
+
+    if (pos < 0 || pos >= li->size) return NULL;
+
+    Node *aux = li->head;
+    for (int i = 0; i < pos; i++) {
+        aux = aux->next;
+    }
+    
+    return aux->data;
+}
+
+void *listGetLast(List l) {
+    if (!l || listIsEmpty(l)) return NULL;
+    list *li = (list *)l;
+    
+    Node *aux = li->head;
+    while (aux->next != NULL) {
+        aux = aux->next;
+    }
+    return aux->data;
+}
+
+bool listAddPos(List l, void *data, int pos) {
+    if (!l) return false;
+    list *li = (list *)l;
+
+    if (pos < 0 || pos > li->size) return false;
+
+    if (pos == 0) return listAddFirst(l, data);
+
+    Node *newNode = malloc(sizeof(Node));
+    if (!newNode) return false;
+    newNode->data = data;
+
+    Node *aux = li->head;
+    for (int i = 0; i < pos - 1; i++) {
+        aux = aux->next;
+    }
+
+    newNode->next = aux->next;
+    aux->next = newNode;
+    li->size++;
+    return true;
 }
